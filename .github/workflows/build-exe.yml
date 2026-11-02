@@ -1,0 +1,38 @@
+name: Build SEM EXEs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install -r requirements.txt
+
+      - name: Build EXEs
+        run: |
+          pyinstaller --onefile --clean --name 1_SEM_Original_Budget "1_SEM_Original_Budget.py"
+          pyinstaller --onefile --clean --name 2_SEM_Daily_spend_Input "2_SEM_Daily_spend_Input.py"
+          pyinstaller --onefile --clean --name 3_SEM_Adjusted_Budget_Ready "3_SEM_Adjusted_Budget_Ready.py"
+          pyinstaller --onefile --clean --name 4_SEM_POE_Reports "4_SEM POE Reports .py"
+          pyinstaller --onefile --clean --name 5_SEM_Invoices_Highlighter "5_SEM_Invoices Highlighter.py"
+          pyinstaller --onefile --clean --name 6_SEM_Accruals "6_SEM Accruals.py"
+
+      - name: Upload EXEs
+        uses: actions/upload-artifact@v4
+        with:
+          name: SEM_Automation_EXEs
+          path: dist/*.exe
