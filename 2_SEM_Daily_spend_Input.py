@@ -519,7 +519,7 @@ def redirect_workstation(daily_spend):
 
     daily_spend['WS Transfer'] = np.where(
 
-        daily_spend['Partner'] == 'BPC Intel CCF Workstation',
+        daily_spend['Partner'] == 'BPS Intel CCF Workstation',
 
         daily_spend['Unused Spend'],
 
@@ -593,7 +593,7 @@ def redirect_workstation(daily_spend):
 
         ==
 
-        'BPC Intel CCF Commercial'
+        'BPS Intel CCF Commercial'
 
     )
 
@@ -661,7 +661,7 @@ def finalize_global_opex_exact_pq(daily_spend):
     df['Final OPEX Spend'] = df['Adjusted Spend'] - df['Final Partner Spend']
 
     # Regla inicial para Workstation
-    df.loc[df['Partner'] == 'BPC Intel CCF Workstation', 'Final OPEX Spend'] = 0.0
+    df.loc[df['Partner'] == 'BPS Intel CCF Workstation', 'Final OPEX Spend'] = 0.0
 
     # Asegurar que la columna de días sea string uniforme para evitar fallas de merge por tipos datetime
     df['Day_Str'] = df['Day'].astype(str)
@@ -674,13 +674,14 @@ def finalize_global_opex_exact_pq(daily_spend):
     # 2. CORRECCIÓN CLAVE: Determinar el destino del OPEX usando "BPS" / "CPS" o "BPC" / "CPC"
     def get_matrix_target(partner):
         p_str = str(partner).strip()
-        if p_str in ["BPC Intel CCF Workstation", "BPC OPEX", "CPC OPEX", "BPS OPEX", "CPS OPEX"]:
+        if p_str in ["BPS Intel CCF Workstation", "BPS OPEX", "CPS OPEX"]:
             return None
-        # Mapeamos de forma flexible si contiene o empieza con las siglas del negocio
-        if "BPC" in p_str or "BPS" in p_str:
-            return "BPC OPEX" # O 'BPS OPEX' según lo tengas nombrado en tu catálogo, cámbialo si tu matriz se llama BPS OPEX
-        elif "CPC" in p_str or "CPS" in p_str:
+            
+        if "BPS" in p_str:
+            return "BPS OPEX"
+        elif "CPS" in p_str:
             return "CPS OPEX"
+            
         return None
 
     df['OPEX Target'] = df['Partner'].apply(get_matrix_target)
@@ -746,8 +747,10 @@ def finalize_global_opex_exact_pq(daily_spend):
 
     # Condición B: Las bolsas matrices reciben la suma de las transferencias
     # Validamos dinámicamente tanto las que tengan 'P' como 'S' por si acaso
-    mask_matrices = df['Partner'].isin(['BPC OPEX', 'CPC OPEX', 'BPS OPEX', 'CPS OPEX'])
+    
+    mask_matrices = df['Partner'].isin(['BPS OPEX', 'CPS OPEX'])
     df.loc[mask_matrices, 'Final OPEX Spend'] = df.loc[mask_matrices, 'Final OPEX Spend'] + df.loc[mask_matrices, 'Transfer OPEX']
+    
 
     # 9. Limpieza final de columnas de control internas
     cols_to_drop = ['OPEX Target', 'AmountToTransfer', 'Transfer OPEX', 'Day_Str', 'Budget Total Real']
