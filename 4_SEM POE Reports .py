@@ -472,20 +472,20 @@ reports_separated = {
 
 
 # =====================================================
-# EXCEL REPORT GENERATION (DYNAMIC INPUTS)
+# EXCEL REPORT GENERATION (SEM - DYNAMIC FOLDER & FILENAME)
 # =====================================================
 
-# Ask user for output folder name
+# Ask user for report period / folder input name
 folder_input = input(
-    "Enter output folder name, for example 'September FY26 Monthly reports': "
+    "Enter report period / folder name, for example 'September FY26': "
 ).strip()
 
-# Use a default folder name if the input is empty
+# Use a default name if the input is empty
 if not folder_input:
-    output_folder = "Default Name - Monthly reports"
-else:
-    output_folder = folder_input
+    folder_input = "September FY26"
 
+# El nombre de la carpeta combina tu input + "Monthly Reports"
+output_folder = f"{folder_input} Monthly Reports"
 os.makedirs(output_folder, exist_ok=True)
 
 # =====================================================
@@ -516,9 +516,48 @@ for name, report in reports_separated.items():
         continue
 
     total_cost_formatted = f"${total_cost:,.2f}"
+    
+    # =================================================
+    # GET PARTNER-SPECIFIC REPORTING PERIOD (FOR HEADER ONLY)
+    # =================================================
+    partner_lookup = (
+        name
+        .removesuffix("_Google")
+        .removesuffix("_Bing")
+        .strip()
+    )
 
-    # Limpiar nombre del archivo para evitar caracteres extraños
-    file_name = f"{name}_SEM_Total_Cost_{total_cost_formatted}_June_Q3_FY26.xlsx"
+    partner_dates = partner_periods.get(partner_lookup)
+
+    if partner_dates:
+        partner_start = partner_dates["Start_Date"]
+        partner_end = partner_dates["End_Date"]
+
+        if pd.notna(partner_start) and pd.notna(partner_end):
+            p_start_dt = pd.to_datetime(partner_start)
+            p_end_dt = pd.to_datetime(partner_end)
+
+            if p_start_dt.date() == p_end_dt.date():
+                period_text = p_start_dt.strftime('%B %d, %Y')
+            else:
+                period_text = (
+                    f"{p_start_dt.strftime('%B %d, %Y')} to "
+                    f"{p_end_dt.strftime('%B %d, %Y')}"
+                )
+        else:
+            period_text = "Active Partner Period"
+    else:
+        period_text = "Reporting period unavailable"
+        print(
+            f"⚠️ Partner not found in partner_periods | "
+            f"Report name: '{name}' | "
+            f"Lookup name: '{partner_lookup}'"
+        )
+
+    # =================================================
+    # FILE NAME (Includes month/period from folder_input)
+    # =================================================
+    file_name = f"{name}_SEM_Total_Cost_{total_cost_formatted}_{folder_input}.xlsx"
     file_path = os.path.join(output_folder, file_name)
 
     with pd.ExcelWriter(file_path, engine='xlsxwriter') as writer:
@@ -532,7 +571,7 @@ for name, report in reports_separated.items():
         # ===============================
         header_df = pd.DataFrame({
             'Report Name': [f'Partner: {name}'],
-            'Period': ['June 1st to 30th Q3FY26']
+            'Period': [period_text]  # Las fechas detalladas se quedan solo en el encabezado interno
         })
         header_df.to_excel(writer, sheet_name=main_sheet_name, index=False, startrow=0)
 
@@ -575,23 +614,20 @@ for name, report in reports_separated.items():
         # ===============================
         # FORMATTING (MONEY COLUMNS)
         # ===============================
-        # Formato en Main Tab
         for col in ['Cost', 'Cost + Fees', 'Avg. CPC']:
             if col in report.columns:
                 col_idx = report.columns.get_loc(col)
                 worksheet.set_column(col_idx, col_idx, None, money_format)
 
-        # Formato en Cost Breakdown Tab (Columnas D y E usualmente Cost y Cost + Fees)
         cost_ws.set_column('D:E', None, money_format)
 
     # =================================================
     # INDIVIDUAL REPORT CONFIRMATION
     # =================================================
-    print(f"✅ Report generated: {file_name} | Total Cost: {total_cost_formatted}")
+    print(f"✅ Report generated: {file_name} | Period: {period_text} | Total Cost: {total_cost_formatted}")
 
 # =====================================================
 # FINAL CONFIRMATION
 # =====================================================
 print("\n✅ All reports are ready")
 print(f"📁 Output folder: {output_folder}")
-
