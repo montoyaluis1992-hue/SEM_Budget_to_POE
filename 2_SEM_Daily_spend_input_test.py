@@ -15,10 +15,7 @@ import traceback
 # FUNCIÓN DE LIMPIEZA ROBUSTA PARA SÍMBOLOS Y COMAS ($ ,)
 #---------------------------------------------------
 def sanitize_numeric_columns(df, columns_to_check):
-    """
-    Limpia de forma automática columnas numéricas contaminadas 
-    con texto, símbolos de moneda ($), comas (,) o espacios por errores de captura.
-    """
+    
     df = df.copy()
     for col in columns_to_check:
         if col in df.columns:
