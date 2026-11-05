@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 # =====================================================
 # Spend SEM
 # VERSION 2
@@ -7,6 +10,27 @@ import pandas as pd
 import numpy as np
 import os
 import traceback
+
+#---------------------------------------------------
+# FUNCIÓN DE LIMPIEZA ROBUSTA PARA SÍMBOLOS Y COMAS ($ ,)
+#---------------------------------------------------
+def sanitize_numeric_columns(df, columns_to_check):
+    """
+    Limpia de forma automática columnas numéricas contaminadas 
+    con texto, símbolos de moneda ($), comas (,) o espacios por errores de captura.
+    """
+    df = df.copy()
+    for col in columns_to_check:
+        if col in df.columns:
+            temp_series = df[col].astype(str).str.strip()
+            temp_series = (
+                temp_series
+                .str.replace('$', '', regex=False)
+                .str.replace(',', '', regex=False)
+                .str.replace('€', '', regex=False)
+            )
+            df[col] = pd.to_numeric(temp_series, errors='coerce').fillna(0.0)
+    return df
 
 #---------------------------------------------------
 # LOAD
@@ -258,7 +282,6 @@ def redirect_workstation(daily_spend):
 
     daily_spend['Adjusted Spend'] = daily_spend['Cost + Fees']
 
-    # Estándar estricto 'BPS'
     mask_ws = (daily_spend['Partner'] == 'BPS Intel CCF Workstation')
     daily_spend.loc[mask_ws, 'Adjusted Spend'] = (
         daily_spend.loc[mask_ws, 'Cost + Fees'] - daily_spend.loc[mask_ws, 'Unused Spend']
@@ -372,6 +395,11 @@ if __name__ == "__main__":
         (q_budget, campaign_conditions, reference, daily_spend_sa360, daily_spend_AdNet) = load_inputs()
         print("Inputs succesfully loaded")
 
+        # 1.1 SANEAMIENTO INICIAL DE DATOS (Remueve $, comas y espacios que rompen cálculos)
+        daily_spend_sa360 = sanitize_numeric_columns(daily_spend_sa360, ['Cost', 'Cost + Fees', 'Clicks', 'Impressions', 'Spend'])
+        daily_spend_AdNet = sanitize_numeric_columns(daily_spend_AdNet, ['Cost', 'Cost + Fees', 'CPC', 'Impressions', 'Clicks'])
+        q_budget = sanitize_numeric_columns(q_budget, ['Funds', 'Aditional OPEX', 'PB1', 'PB1 Rate', 'PB2', 'PB2 Rate', 'PB3', 'PB3 Rate'])
+
         # 2. AdNet Pre-processing & Week mapping
         daily_spend_AdNet['Account name'] = 'Ad.Net'
         rename_map = {'Date':'Day', 'Cost':'Cost + Fees','CPC':'Avg. CPC'}
@@ -469,7 +497,7 @@ if __name__ == "__main__":
         daily_spend = allocate_partner_all(daily_spend, spend_col='Adjusted Spend')
         daily_spend = finalize_global_opex_exact_pq(daily_spend)
 
-        # 10. Summary & Output Generation (Incluyendo PS1, PS2 y PS3)
+        # 10. Summary & Output Generation
         daily_summary = daily_spend[[
             'Category', 'Partner', 'Day', 'Week (Sun - Sat)', 
             'HHO Revenue', 'Cost + Fees', 'Clicks', 'Impr.', 
@@ -498,5 +526,4 @@ if __name__ == "__main__":
         traceback.print_exc()
 
     finally:
-        # Se ejecuta siempre (éxito o error) manteniendo la ventana abierta
         input("\nClick ENTER to close this window...")
