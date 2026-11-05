@@ -1,4 +1,3 @@
-
 # =====================================================
 # Spend SEM
 # VERSION 2
@@ -259,7 +258,7 @@ def redirect_workstation(daily_spend):
 
     daily_spend['Adjusted Spend'] = daily_spend['Cost + Fees']
 
-    # Corrección aplicada: Estándar estricto 'BPS'
+    # Estándar estricto 'BPS'
     mask_ws = (daily_spend['Partner'] == 'BPS Intel CCF Workstation')
     daily_spend.loc[mask_ws, 'Adjusted Spend'] = (
         daily_spend.loc[mask_ws, 'Cost + Fees'] - daily_spend.loc[mask_ws, 'Unused Spend']
@@ -426,7 +425,7 @@ if __name__ == "__main__":
         daily_spend = daily_spend.rename(columns={'Funds': 'OPEX Budget'})
         daily_spend = daily_spend.sort_values(["Partner", "Day"]).reset_index(drop=True)
 
-        # 8. Fix Types (Numérica y Fechas) - Con la coma corregida en 'Aditional OPEX'
+        # 8. Fix Types (Numérica y Fechas)
         numeric_cols = [
             'Cost + Fees', 
             'OPEX Budget', 
@@ -470,11 +469,12 @@ if __name__ == "__main__":
         daily_spend = allocate_partner_all(daily_spend, spend_col='Adjusted Spend')
         daily_spend = finalize_global_opex_exact_pq(daily_spend)
 
-        # 10. Summary & Output Generation
+        # 10. Summary & Output Generation (Incluyendo PS1, PS2 y PS3)
         daily_summary = daily_spend[[
             'Category', 'Partner', 'Day', 'Week (Sun - Sat)', 
             'HHO Revenue', 'Cost + Fees', 'Clicks', 'Impr.', 
-            'HHO GM (Conv Time)', 'Final Partner Spend', 'Final OPEX Spend'
+            'HHO GM (Conv Time)', 'PS1', 'PS2', 'PS3', 
+            'Final Partner Spend', 'Final OPEX Spend'
         ]]
 
         daily_spend_AdNet = daily_spend_AdNet.groupby(["Partner", 'Week (Sun - Sat)'], as_index=False).agg({
