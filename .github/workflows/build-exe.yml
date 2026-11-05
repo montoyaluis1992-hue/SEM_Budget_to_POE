@@ -25,7 +25,8 @@ jobs:
       - name: Build EXEs
         run: |
           pyinstaller --onefile --clean --name 1_SEM_Original_Budget "1_SEM_Original_Budget.py"
-          pyinstaller --onefile --clean --name 2_SEM_Daily_spend_Input "2_SEM_Daily_spend_Input.py"
+          pyinstaller --onefile --clean --name 2_SEM_Daily_spend_Input "2_SEM_Daily_spend_Input.py"  2_SEM_Daily_spend_input_test.py
+          pyinstaller --onefile --clean --name 2_SEM_Daily_spend_Input_test "2_SEM_Daily_spend_input_test.py"
           pyinstaller --onefile --clean --name 3_SEM_Adjusted_Budget_Ready "3_SEM_Adjusted_Budget_Ready.py"
           pyinstaller --onefile --clean --name 4_SEM_POE_Reports "4_SEM POE Reports .py"
           pyinstaller --onefile --clean --name 5_SEM_Invoices_Highlighter "5_SEM_Invoices Highlighter.py"
