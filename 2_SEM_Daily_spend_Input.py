@@ -323,7 +323,7 @@ daily_spend = (daily_spend.sort_values(["Partner", "Day"]).reset_index(drop=True
 
 numeric_cols = ['Cost + Fees', 
                 'OPEX Budget', 
-                'Aditional OPEX'
+                'Aditional OPEX',
                 'PB1',
                 'PB1 Rate', 
                 'PB2',
@@ -565,7 +565,7 @@ def redirect_workstation(daily_spend):
 
         ==
 
-        'BPC Intel CCF Workstation'
+        'BPS Intel CCF Workstation'
 
     )
 
