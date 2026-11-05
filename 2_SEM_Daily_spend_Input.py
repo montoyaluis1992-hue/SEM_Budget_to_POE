@@ -791,3 +791,19 @@ daily_summary.to_csv(daily_summary_file, index=False)
 daily_spend_AdNet.to_csv(adnet_file, index=False)
 print('Daily Doc ready')
 
+import traceback
+
+if __name__ == "__main__":
+    try:
+        # Aquí iría todo tu flujo principal de ejecución 
+        # (desde la carga de inputs hasta guardar el CSV)
+        print("¡We're good to go!")
+        
+    except Exception as e:
+        print("\n[ERROR] Something went wrong:")
+        traceback.print_exc()
+        
+    finally:
+        # Esto se ejecuta siempre, tanto si hubo error como si terminó bien
+        input("\nClick ENTER to close this window...")
+
