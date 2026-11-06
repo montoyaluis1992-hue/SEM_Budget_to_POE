@@ -114,7 +114,6 @@ campaigns_highlighter = campaigns_highlighter.rename(columns={'Partner Category'
 #print(campaigns_highlighter.head())
 
 sem_partner_list = sorted(campaigns_highlighter['Partner'].unique())
-#print(cse_partner_list)
 
 
 # In[11]:
@@ -141,7 +140,7 @@ for x in sem_partner_list:
 # In[13]:
 
 
-# Iterar sobre los DataFrames de la lista cse_reports_list
+# Iterar sobre los DataFrames de la lista sem_reports_list
 for df_name in sem_partner_list:
     # Obtener el DataFrame por su nombre de la lista
     df = globals()[df_name]
@@ -304,7 +303,7 @@ for df_name in new_dataframe_names:
         cost_str = f"${total_cost:,.0f}"
 
         # Crear nombre del PDF usando únicamente el sufijo limpio (ej. September Q4FY26) y el costo
-        output_pdf_name = f'{df_name}_CSE_{folder_suffix}_Invoice_{cost_str}'
+        output_pdf_name = f'{df_name}_SEM_{folder_suffix}_Invoice_{cost_str}'
 
         # Definir rutas de los PDFs dentro de la carpeta "Invoice Input"
         google_pdf_path = os.path.join("Invoice Input", "Invoice_Google_SEM.pdf")
