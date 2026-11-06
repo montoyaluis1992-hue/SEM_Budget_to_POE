@@ -212,7 +212,7 @@ print("SEM Report Categories Assigned Successfully from Excel Rules")
 # In[9]:
 
 
-sem_report
+#sem_report
 
 
 # In[10]:
@@ -235,7 +235,7 @@ format="%Y-%m-%d",
 errors="coerce")
 # Convert dates
 sem_report["Day"] = pd.to_datetime(
-    daily_spend["Day"],
+    sem_report["Day"],
     dayfirst=True,
     errors="coerce")
 
