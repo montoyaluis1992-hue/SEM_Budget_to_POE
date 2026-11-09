@@ -304,7 +304,6 @@ def finalize_global_opex_exact_pq(daily_spend):
     df['Adjusted Spend'] = pd.to_numeric(df['Adjusted Spend'], errors='coerce').fillna(0.0)
 
     df['Final OPEX Spend'] = df['Adjusted Spend'] - df['Final Partner Spend']
-    df.loc[df['Partner'] == 'BPS Intel CCF Workstation', 'Final OPEX Spend'] = 0.0
 
     df['Day_Str'] = df['Day'].astype(str)
 
