@@ -4,9 +4,14 @@
 import os
 import re
 import traceback
+import warnings
 import fitz  # PyMuPDF
 import numpy as np
 import pandas as pd
+
+# Ignorar advertencias de obsolescencia de librerías para mantener la consola limpia
+warnings.filterwarnings('ignore', category=FutureWarning)
+warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 
 # =====================================================
@@ -147,7 +152,7 @@ def main():
 
     for df_name in sem_partner_list:
         df = partner_dfs[df_name]
-        grouped_df = df.groupby(['Campaign', 'Partner']).apply(list).reset_index()
+        grouped_df = df.groupby(['Campaign', 'Partner'], include_groups=False).apply(list).reset_index()
         partner_dfs[df_name] = grouped_df
 
     # Split into Google and Bing
