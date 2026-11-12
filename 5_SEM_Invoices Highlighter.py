@@ -152,7 +152,7 @@ def main():
 
     for df_name in sem_partner_list:
         df = partner_dfs[df_name]
-        grouped_df = df.groupby(['Campaign', 'Partner'], include_groups=False).apply(list).reset_index()
+        grouped_df = df.groupby(['Campaign', 'Partner']).apply(list).reset_index()
         partner_dfs[df_name] = grouped_df
 
     # Split into Google and Bing
@@ -227,4 +227,3 @@ if __name__ == "__main__":
         traceback.print_exc()
     finally:
         input("\nClick ENTER to close this window...")
-
