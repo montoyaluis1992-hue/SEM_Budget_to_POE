@@ -5,7 +5,7 @@ import os
 import re
 import traceback
 import warnings
-import fitz  # PyMuPDF
+import pymupdf as fitz  # PyMuPDF
 import numpy as np
 import pandas as pd
 
