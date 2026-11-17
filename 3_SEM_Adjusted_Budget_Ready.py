@@ -323,7 +323,7 @@ def main():
             (original_budget['Funds'] == 'Partner')
             &
             (
-                original_budget['Category']
+                original_budget['Partner']
                 .isin(
                     excluded_categories
                 )
