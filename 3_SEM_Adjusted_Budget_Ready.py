@@ -312,9 +312,10 @@ def main():
     original_budget = pd.concat([partner, opex], ignore_index=True)
 
     excluded_categories = [
-        'Print',
-        'PLA PSG BPS',
-        'PLA PSG CPS'
+        'PHW OPEX',
+        'BPS OPEX',
+        'CPS OPEX', 
+        'Brand OPEX'
     ]
 
     original_budget = original_budget[
@@ -450,4 +451,3 @@ if __name__ == "__main__":
         traceback.print_exc()
     finally:
         input("\nClick ENTER to close this window...")
-
