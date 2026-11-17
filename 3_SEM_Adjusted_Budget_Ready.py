@@ -300,6 +300,13 @@ def main():
                                'WPB3', 'Total Partner Budget', 'OPEX Weekly Budget', 'TPS', 'OPEX Spend',
                                'WAPB1', 'WAPB2', 'WAPB3', 'Adj TPB', 'Adj OPEXWB']].copy()
 
+    excluded_partners = [
+        'PHW OPEX',
+        'BPS OPEX',
+        'CPS OPEX', 
+        'Brand OPEX'
+    ]
+
     # 9. Original Budget Pivots
     partner = budget_final_doc[["Partner", 'Category', "Fiscal Week", 'Total Partner Budget']].copy()
     partner["Funds"] = "Partner"
@@ -311,13 +318,6 @@ def main():
 
     original_budget = pd.concat([partner, opex], ignore_index=True)
 
-    excluded_categories = [
-        'PHW OPEX',
-        'BPS OPEX',
-        'CPS OPEX', 
-        'Brand OPEX'
-    ]
-
     original_budget = original_budget[
         ~(
             (original_budget['Funds'] == 'Partner')
@@ -325,7 +325,7 @@ def main():
             (
                 original_budget['Partner']
                 .isin(
-                    excluded_categories
+                    excluded_partners
                 )
             )
         )
@@ -356,9 +356,9 @@ def main():
             (adjusted_budget['Funds'] == 'Partner')
             &
             (
-                adjusted_budget['Category']
+                adjusted_budget['Partner'] # <-- Corregido aquí también de 'Category' a 'Partner'
                 .isin(
-                    excluded_categories
+                    excluded_partners
                 )
             )
         )
@@ -450,4 +450,7 @@ if __name__ == "__main__":
         print("\n[ERROR] Something went wrong:")
         traceback.print_exc()
     finally:
-        input("\nClick ENTER to close this window...")
+        if not os.environ.get("CI"):
+            input("\nClick ENTER to close this window...")
+        else:
+            print("\nExecution finished in CI environment. Skipping interactive prompt.")
