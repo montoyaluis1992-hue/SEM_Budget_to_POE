@@ -302,7 +302,7 @@ def main():
         'Headline 1', 'Headline 2',
         'Description', 'Description 1', 'Description 2',
         'Clicks', 'Impr.', 'CTR', 'Avg. CPC',
-        'Cost', 'Cost + Fees'
+        'Cost', 'Cost + Fees', 'Final URL'
     ]
 
     reports_separated = {
